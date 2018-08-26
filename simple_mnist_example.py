@@ -8,23 +8,33 @@ print("shape of data:", mnist.test.images.shape)
 
 def model():
     data = tf.placeholder(tf.float32, shape = [None, 28, 28, 1], name='input_data')
-    conv1 = tf.layers.conv2d(data, kernel_size=3, use_bias=True, strides=(2,2), activation=tf.nn.relu, padding="SAME", filters=4 )
-    conv2 = tf.layers.conv2d(data, kernel_size=3, use_bias=True, strides=(2,2), activation=tf.nn.relu, padding="SAME", filters=8 )
-    conv3 = tf.layers.conv2d(data, kernel_size=3, use_bias=True, strides=(2,2), activation=tf.nn.relu, padding="SAME", filters=12 )
+    conv1 = tf.layers.conv2d(data, kernel_size=5, use_bias=True, strides=(1,1), activation=tf.nn.relu, padding="SAME", filters=9 )
+    # dp1   = tf.nn.dropout(conv1, keep_prob=0.75)
+
+    
+    conv2 = tf.layers.conv2d(conv1, kernel_size=5, use_bias=True, strides=(2,2), activation=tf.nn.relu, padding="SAME", filters=16 )
+    # dp2   = tf.nn.dropout(conv2, keep_prob=0.75)
+
+    conv3 = tf.layers.conv2d(conv2, kernel_size=5, use_bias=True, strides=(2,2), activation=tf.nn.relu, padding="SAME", filters=25 )
+    # dp3   = tf.nn.dropout(conv3, keep_prob=0.75)
 
     flatten1 = tf.layers.flatten(conv3)
     fc1 = tf.layers.dense(flatten1, units=200, activation=tf.nn.relu, use_bias=True)
-    fc2 = tf.layers.dense(fc1, units=80, activation=tf.nn.relu, use_bias=True)
-    fc3 = tf.layers.dense(fc2, units=10, activation=tf.nn.relu, use_bias=True)
+    dp1 = tf.nn.dropout(fc1, keep_prob=0.75)
+
+    fc2 = tf.layers.dense(dp1, units=80, activation=tf.nn.relu, use_bias=True)
+    dp2 = tf.nn.dropout(fc2, keep_prob=0.75)
+
+    fc3 = tf.layers.dense(dp2, units=10, activation=tf.nn.relu, use_bias=True)
 
     result = tf.nn.softmax(fc3)
     return result
 
 
 
-NUM_EPOCHS = 10
+NUM_EPOCHS = 500
 BATCH_SIZE = 100
-lr = 0.005
+lr = 0.0005
 
 data_rows = mnist.test.images.shape[0]
 print("data_rows:", data_rows)
